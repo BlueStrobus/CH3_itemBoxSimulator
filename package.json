@@ -1,15 +1,17 @@
 {
-  "name": "3W7",
+  "name": "ch3Items",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "cookie-parser": "^1.4.7",
+    "@prisma/client": "^6.0.0",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.22.0"
+    "prisma": "^6.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"

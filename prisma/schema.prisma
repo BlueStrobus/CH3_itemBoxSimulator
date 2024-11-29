@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+//schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // MySQL 데이터베이스 엔진을 사용합니다.
+  provider = "mysql"
+  // 데이터베이스 연결 정보를 .env 파일의 DATABASE_URL 로부터 읽어옵니다.
+  url      = "mysql://root:aaaa4321@express-database.cvyiaeceu603.ap-northeast-2.rds.amazonaws.com:3306/itemBox"
+
+  // env("DATABASE_URL")
+}
+
+// 터미널
+// schema.prisma 파일에 설정된  모델을 바탕으로 MySQL에 정보를 업로드합니다.
+// npx prisma db push
+
+// 캐릭터 테이블에서 계정 칼럼 빼기(시간부족으로 인증 빼라고 하심)
+
+model Skins {
+  skinId      Int    @id @default(autoincrement()) @map("skinId")
+  name        String @unique @map("name")
+  description String @map("description") @db.Text
+  imgurl      String @map("imgurl") @db.Text
+
+  updatedAt DateTime @updatedAt @map("updatedAt")
+  createdAt DateTime @default(now()) @map("createdAt")
+
+  character Characters[]
+
+  @@map("Skins")
+}
+
+model Characters {
+  characterId Int      @id @default(autoincrement()) @map("characterId")
+  skinId      Int?     @map("skinId")
+  name        String   @unique @map("name")
+  level       Int      @default(1) @map("leval")
+  hp          Int      @default(100) @map("hp")
+  power       Int      @default(10) @map("power")
+  defense     Int      @default(10) @map("defense")
+  speed       Int      @default(10) @map("speed")
+  money       Int      @default(10000) @map("money")
+  updatedAt   DateTime @updatedAt @map("updatedAt")
+  createdAt   DateTime @default(now()) @map("createdAt")
+  // 장착 부위별로 추가?
+
+  skin Skins? @relation(fields: [skinId], references: [skinId], onDelete: SetDefault)
+
+  characterItem      CharacterItems[]
+  CharacterInventory CharacterInventory[]
+
+  @@map("Characters")
+}
+
+model CharacterItems {
+  characterItemId Int        @id @default(autoincrement()) @map("characterItemId")
+  characterId     Int        @map("characterId")
+  itemId          Int        @map("itemId")
+  updatedAt       DateTime   @updatedAt @map("updatedAt")
+  character       Characters @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
+  item            Items      @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+
+  @@map("CharacterItems")
+}
+
+model CharacterInventory {
+  characterItemId Int        @id @default(autoincrement()) @map("characterItemId")
+  characterId     Int        @map("characterId")
+  itemId          Int        @map("itemId")
+  itemCount       Int        @map("itemCount") // itemId 가준으로 동일 물품 개수 카운트`
+  updatedAt       DateTime   @updatedAt @map("updatedAt")
+  character       Characters @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
+  item            Items      @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+
+  @@map("CharacterInventory")
+}
+
+model Items {
+  itemId           Int      @id @default(autoincrement()) @map("itemId") // 인벤 안에 동일번호 아이템은 개수 증가
+  name             String   @map("name")
+  description      String   @map("description") @db.Text // 설명
+  price            Int      @map("price") // 가격
+  iHp              Int      @map("iHp")
+  iPower           Int      @map("iPower")
+  iDefense         Int      @map("iDefense")
+  iSpeed           Int      @map("iSpeed")
+  mountingLocation String   @map("mountingLocation") // 장착위치  
+  updatedAt        DateTime @updatedAt @map("updatedAt")
+  createdAt        DateTime @default(now()) @map("createdAt")
+
+  CharacterInventory CharacterInventory[]
+  CharacterItems     CharacterItems[]
+
+  @@map("Items")
+}
